@@ -19,17 +19,19 @@ class book_view(ListAPIView,views.APIView):
     queryset = models.book.objects.all()
     serializer_class=serializers.serbook
     filter_backends = [DjangoFilterBackend,OrderingFilter,filters.SearchFilter]
-    search_fields = ['title']
+    search_fields = ['title','author__name']
     ordering_fields=['price']
 class book_create(views.APIView):
     # permission_classes=[IsAuthenticated]
     def post(self,request):
-        data = {
-            "title" : request.data['title'],
-            "price" : request.data['price'],
-            "totalpage": request.data['totalpage'],
-            "author": models.auther.objects.get(name=request.data['author']).id
-        }
+        data=None
+        if request.data!={}:
+            data = {
+                "title" : request.data['title'],
+                "price" : request.data['price'],
+                "totalpage": request.data['totalpage'],
+                "author": models.auther.objects.get(name=request.data['author']).id
+            }
         ser=serializers.serbook(data=data)
         if ser.is_valid():
             ser.save()
